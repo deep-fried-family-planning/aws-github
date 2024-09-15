@@ -4,22 +4,24 @@ variable "public_repos" {
   }))
   default = {
     aws_github = {
-      description = "github repo configurations with terraform"
+      description = "github repo config with terraform"
     }
     aws_organization = {
       description = "AWS organization config with terraform"
+    }
+    aws_discord = {
+      description = "discord server config with terraform"
     }
   }
 }
 
 resource "github_repository" "public" {
-  for_each = var.public_repos
-
+  for_each                    = var.public_repos
   name                        = replace(each.key, "_", "-")
   description                 = each.value.description
   visibility                  = "public"
   license_template            = "mit"
-  gitignore_template          = "terraform"
+  gitignore_template          = "Terraform"
   allow_auto_merge            = false
   allow_squash_merge          = true
   squash_merge_commit_title   = "COMMIT_OR_PR_TITLE"
@@ -47,43 +49,43 @@ resource "github_repository" "public" {
 }
 
 resource "github_branch" "public_main" {
-  for_each = element(github_repository.public[*], 0)
-
+  for_each   = element(github_repository.public[*], 0)
   repository = each.value.name
   branch     = "main"
 }
 
 resource "github_branch_default" "public_main" {
-  for_each = element(github_repository.public[*], 0)
-
+  for_each   = element(github_repository.public[*], 0)
   repository = each.value.name
   branch     = github_branch.public_main[each.key].branch
 }
 
 resource "github_branch_protection" "public_main" {
-  for_each = element(github_repository.public[*], 0)
-
+  for_each                = element(github_repository.public[*], 0)
   repository_id           = each.value.node_id
   pattern                 = "main"
   required_linear_history = true
   allows_deletions        = false
   allows_force_pushes     = false
-  force_push_bypassers    = [data.github_user.ryanemcdaniel.node_id]
+  force_push_bypassers = [
+    data.github_user.users["ryanemcdaniel"].node_id
+  ]
   required_pull_request_reviews {
     require_code_owner_reviews      = true
     required_approving_review_count = 1
     require_last_push_approval      = true
-    dismiss_stale_reviews           = true
-    restrict_dismissals             = true
-    dismissal_restrictions          = ["/${data.github_user.ryanemcdaniel.username}"]
-    pull_request_bypassers          = ["/${data.github_user.ryanemcdaniel.username}"]
+
+    dismiss_stale_reviews = true
+    restrict_dismissals   = true
+    dismissal_restrictions = [
+      "/${data.github_user.users["ryanemcdaniel"].username}"
+    ]
+
+    pull_request_bypassers = [
+      "/${data.github_user.users["ryanemcdaniel"].username}"
+    ]
   }
   required_status_checks {
     strict = true
   }
-}
-
-import {
-  id = "aws-github"
-  to = github_repository.public["aws_github"]
 }

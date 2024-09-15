@@ -41,3 +41,7 @@ data "aws_ssm_parameter" "gh_org_email" {
 data "github_organization" "dffp" {
   name = "deep-fried-family-planning"
 }
+
+locals {
+  ryanemcdaniel = data.github_user.users["ryanemcdaniel"]
+}
