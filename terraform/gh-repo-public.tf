@@ -3,6 +3,12 @@ variable "public_repos" {
     description = optional(string, null)
   }))
   default = {
+    ".github" = {
+      description = ""
+    }
+    onboarding = {
+      description = "DFFP developer guide and documentation"
+    }
     aws_github = {
       description = "github repo config with terraform"
     }
