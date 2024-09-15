@@ -16,6 +16,7 @@ resource "github_repository" "public" {
     description                 = each.value.description
     visibility                  = "public"
     license_template            = "mit"
+    gitignore_template = "terraform"
     allow_auto_merge            = false
     allow_squash_merge          = true
     squash_merge_commit_title   = "COMMIT_OR_PR_TITLE"
