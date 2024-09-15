@@ -1,25 +1,36 @@
 variable "public_repos" {
   type = map(object({
     description = optional(string, null)
+    has_wiki    = optional(bool, false)
   }))
   default = {
     ".github" = {
       description = ""
+      has_wiki    = false
     }
     onboarding = {
       description = "DFFP developer guide and documentation"
+      has_wiki    = false
     }
     aws_github = {
       description = "github repo config with terraform"
+      has_wiki    = false
     }
     aws_organization = {
       description = "AWS organization config with terraform"
+      has_wiki    = false
     }
     aws_discord = {
       description = "discord server config with terraform"
+      has_wiki    = false
     }
     clash_discord_bot = {
       description = "DFFP's clash of clans discord bot"
+      has_wiki    = false
+    }
+    clash_discord_bot_assets = {
+      description = "DFFP's clash discord bot assets"
+      has_wiki    = true
     }
   }
 }
@@ -48,6 +59,9 @@ resource "github_repository" "public" {
   auto_init                   = true
   vulnerability_alerts        = true
   security_and_analysis {
+    advanced_security {
+      status = "enabled"
+    }
     secret_scanning {
       status = "enabled"
     }
@@ -76,23 +90,15 @@ resource "github_branch_protection" "public_main" {
   required_linear_history = true
   allows_deletions        = false
   allows_force_pushes     = false
-  force_push_bypassers = [
-    data.github_user.users["ryanemcdaniel"].node_id
-  ]
+  force_push_bypassers    = local.main_force_push_bypassers
   required_pull_request_reviews {
     require_code_owner_reviews      = true
     required_approving_review_count = 1
     require_last_push_approval      = true
-
-    dismiss_stale_reviews = true
-    restrict_dismissals   = true
-    dismissal_restrictions = [
-      "/${data.github_user.users["ryanemcdaniel"].username}"
-    ]
-
-    pull_request_bypassers = [
-      "/${data.github_user.users["ryanemcdaniel"].username}"
-    ]
+    dismiss_stale_reviews           = true
+    restrict_dismissals             = true
+    dismissal_restrictions          = local.main_dismissal_restrictions
+    pull_request_bypassers          = local.main_pull_request_bypassers
   }
   required_status_checks {
     strict = true
