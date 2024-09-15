@@ -12,6 +12,9 @@ variable "public_repos" {
     aws_discord = {
       description = "discord server config with terraform"
     }
+    clash_discord_bot = {
+      description = "DFFP's clash of clans discord bot"
+    }
   }
 }
 
