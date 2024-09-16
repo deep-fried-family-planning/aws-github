@@ -25,8 +25,7 @@ locals {
 }
 
 resource "github_membership" "users" {
-  for_each             = var.users
-  username             = each.key
-  role                 = element(each.value, 0)
-  downgrade_on_destroy = true
+  for_each             = element(data.github_user.users[*], 0)
+  username             = each.value.username
+  role                 = element(var.users[each.key], 0)
 }

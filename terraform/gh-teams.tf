@@ -26,15 +26,10 @@ resource "github_team_repository" "admin" {
   permission = "admin"
 }
 
-resource "github_team_members" "admin" {
-  team_id = github_team.docs.id
-  dynamic "members" {
-    for_each = { for k, v in var.users : k => v if element(v, 1) == github_team.admin.name }
-    content {
-      username = members.key
-      role     = members.value[2]
-    }
-  }
+resource "github_team_membership" "admin_maintainer" {
+  team_id  = github_team.admin.id
+  username = data.github_user.users["ryanemcdaniel"].username
+  role     = "maintainer"
 }
 
 
@@ -62,15 +57,17 @@ resource "github_team_repository" "dev" {
   permission = "push"
 }
 
-resource "github_team_members" "dev" {
-  team_id = github_team.docs.id
-  dynamic "members" {
-    for_each = { for k, v in var.users : k => v if element(v, 1) == github_team.dev.name }
-    content {
-      username = members.key
-      role     = members.value[2]
-    }
-  }
+resource "github_team_membership" "dev_maintainer" {
+  team_id  = github_team.dev.id
+  username = data.github_user.users["ryanemcdaniel"].username
+  role     = "maintainer"
+}
+
+resource "github_team_membership" "dev_member" {
+  for_each = { for k, v in var.users : k => v if element(v, 1) == "Dev" }
+  team_id  = github_team.dev.id
+  username = each.key
+  role     = each.value[2]
 }
 
 
@@ -97,14 +94,15 @@ resource "github_team_repository" "docs" {
   permission = "admin"
 }
 
-resource "github_team_members" "docs" {
-  count   = 0
-  team_id = github_team.docs.id
-  dynamic "members" {
-    for_each = { for k, v in var.users : k => v if element(v, 1) == github_team.docs.name }
-    content {
-      username = members.key
-      role     = members.value[2]
-    }
-  }
+resource "github_team_membership" "docs_maintainer" {
+  team_id  = github_team.docs.id
+  username = data.github_user.users["ryanemcdaniel"].username
+  role     = "maintainer"
+}
+
+resource "github_team_membership" "docs_member" {
+  for_each = { for k, v in var.users : k => v if element(v, 1) == "Docs" }
+  team_id  = github_team.docs.id
+  username = each.key
+  role     = "member"
 }
