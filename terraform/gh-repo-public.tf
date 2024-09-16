@@ -54,14 +54,11 @@ resource "github_repository" "public" {
   has_issues                  = true
   has_discussions             = false
   has_projects                = false
-  has_wiki                    = false
+  has_wiki                    = each.value.has_wiki
   has_downloads               = false
   auto_init                   = true
   vulnerability_alerts        = true
   security_and_analysis {
-    advanced_security {
-      status = "enabled"
-    }
     secret_scanning {
       status = "enabled"
     }
