@@ -2,6 +2,7 @@ variable "users" {
   type = map(list(string))
   default = {
     ryanemcdaniel     = ["admin", "Admin", "maintainer"]
+    EmpathyTerabyte   = ["member", "Docs", "member"]
     "Khatry-With-A-Y" = ["member", "Dev", "member"]
     "5hubham6"        = ["member", "Dev", "member"]
   }
